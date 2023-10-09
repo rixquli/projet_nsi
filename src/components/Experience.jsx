@@ -7,6 +7,7 @@ import Floor from "./3d_elements/Floor";
 import ExampleObject from "./3d_elements/Example";
 import Lights from "./Lights.jsx";
 import Game1 from "./game1/Index.jsx";
+import { Suspense } from "react";
 
 const Experience = () => {
   /**
@@ -34,9 +35,11 @@ const Experience = () => {
 
   return (
     <>
-      <Perf position="top-left" />{/* Affiche les performances */}
+      <Perf position="top-left" />
+      {/* Affiche les performances */}
 
-      <Lights />{/* Initialise les lumières */}
+      <Lights />
+      {/* Initialise les lumières */}
 
       <Grid
         args={[300, 300]}
@@ -44,24 +47,27 @@ const Experience = () => {
         cellColor={"gray"}
         position={[0, -0.99, 0]}
         userData={{camExcludeCollision: true}} // this won't be collide by camera ray
-      />{/* Initialise la grille au sol */}
+      />
+      {/* Initialise la grille au sol */}
 
-      <Physics debug={physics} timeStep="vary" gravity={[0, -20, 0]}> 
-        {/* Keyboard preset */}
-        <KeyboardControls map={keyboardMap}>
-          {/* Character Control */}
-          <Game1 />
-        </KeyboardControls>
+      <Suspense>
+        <Physics debug={physics} timeStep="vary" gravity={[0, -20, 0]}>
+          {/* Keyboard preset */}
+          <KeyboardControls map={keyboardMap}>
+            {/* Character Control */}
+            <Game1 />
+          </KeyboardControls>
 
-        {/* 3D Ojects */}
-        {/* <ExampleObject /> */}
+          {/* 3D Ojects */}
+          {/* <ExampleObject /> */}
 
-        {/* Floor */}
-        <Floor />
+          {/* Floor */}
+          <Floor />
 
-        {/* Shoting cubes */}
-        {/* <ShotCube /> */}
-      </Physics>
+          {/* Shoting cubes */}
+          {/* <ShotCube /> */}
+        </Physics>
+      </Suspense>
     </>
   );
 };

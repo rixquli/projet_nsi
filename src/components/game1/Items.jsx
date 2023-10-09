@@ -1,11 +1,10 @@
 import {useFrame, useThree} from "@react-three/fiber";
-import {RigidBody, vec3} from "@react-three/rapier";
+import {BallCollider, RigidBody, vec3} from "@react-three/rapier";
 import {useEffect, useRef, useState} from "react";
 import {Plane, Raycaster, Vector3} from "three";
 import {playAudio, useGameStore} from "../../store.js";
 import {useGLTF, useKeyboardControls} from "@react-three/drei";
 // import {Controls} from "../../App.jsx";
-import ItemsModel from "./3d_elements/ItemsModel";
 
 export function Items() {
   const {camera} = useThree();
@@ -21,10 +20,10 @@ export function Items() {
   const [canMove, setCanMove] = useState(false);
   const [touchPosition, setTouchPosition] = useState(null);
   const [isTouching, setIsTouching] = useState(false);
+  const {scene} = useGLTF("/models/low_poly_recycle_props.glb");
+  const body = useRef();
   // const [touchCup, setTouchCup] = useState(false);
   // viewport = canvas in 3d units (meters)
-
-  const body = useRef();
 
   const {isMouseDown} = useGameStore();
 
@@ -144,17 +143,42 @@ export function Items() {
       gameData.restartItemDone();
       resetPosition();
     }
-    if (body.current.isEnabled() && itemCanMove) {
+    if (body.current && body.current?.isEnabled() && itemCanMove) {
       body.current.setEnabled(false);
     }
   }, [gameState]);
 
-  return (
-    <group position={new Vector3(0, 5, -5)}>
+  // const getObject = (id) => {
+  //   console.log(scene);
+  //   const children = scene.children;
+  //   console.log(children);
+
+  //   // Loop through all children and set their visibility
+  //   children.forEach((child) => {
+  //     if (child.name === id) {
+  //       // Show the child with a matching name
+  //       child.visible = true;
+  //     } else {
+  //       // Hide all other children
+  //       child.visible = false;
+  //     }
+  //   });
+  // };
+
+  // useEffect(() => {
+  //   getObject(gameData.itemToThrowId);
+  // }, [gameData.itemToThrowId]);
+
+  return scene.children.map((child) => {
+    if (child.name != gameData.itemToThrowId) {
+      return null; // Retourne null pour les tasses qui ne sont plus dans la liste cups
+    }
+    return (
+      <group position={new Vector3(0, 5, -5)}>
       <RigidBody
         mass={0.25}
         friction={0.01}
-        ref={body}
+        ref={body}  
         colliders="ball"
         restitution={1.5}
         name="item"
@@ -164,8 +188,27 @@ export function Items() {
             // playAudio("pong_sound");
           }
         }}>
-        <ItemsModel id={gameData.itemToThrowId}></ItemsModel>
-        {/* <primitive object={getObject()} /> */}
+        <primitive object={child.clone()} />
+      </RigidBody>
+    </group>
+    );
+  });
+
+  return (
+    <group position={new Vector3(0, 5, -5)}>
+      <RigidBody
+        mass={0.25}
+        friction={0.01}
+        ref={body}  
+        restitution={1.5}
+        name="item"
+        onCollisionEnter={(e) => {
+          if (e.rigidBodyObject.name === "floor") {
+            resetPosition();
+            // playAudio("pong_sound");
+          }
+        }}>
+        <primitive object={scene} />
       </RigidBody>
     </group>
   );

@@ -1,8 +1,10 @@
-import {BallCollider, CuboidCollider, RigidBody} from "@react-three/rapier";
+import {CuboidCollider, RigidBody} from "@react-three/rapier";
 import {useGLTF} from "@react-three/drei";
-import {useEffect} from "react";
+import {useEffect, useRef, useState} from "react";
 import * as THREE from "three";
 import {useGameStore} from "../../../store.js";
+import {useLoader} from "@react-three/fiber";
+import CongratulationsEffect from "../../Particles.jsx";
 
 export default function Trash({name, pos}) {
   // Load models
@@ -10,6 +12,9 @@ export default function Trash({name, pos}) {
     gameData: state.gameData["GAME1"],
   }));
   const object = useGLTF(`/models/${name}.glb`);
+
+  const [particle, setParticle] = useState(true);
+  const [isCorrect, setIsCorrect] = useState(null);
 
   useEffect(() => {
     // Receive Shadows
@@ -23,6 +28,14 @@ export default function Trash({name, pos}) {
     });
   }, []);
 
+  // Create materials with textures
+  const [colorMap, roughnessMap, normalMap] = useLoader(THREE.TextureLoader, [
+    "/textures/15_-_Default_baseColor.png",
+    "/textures/15_-_Default_metallicRoughness.png",
+    "/textures/15_-_Default_normal.png",
+  ]);
+
+
   return (
     <group position={pos}>
       <RigidBody type="fixed" colliders="trimesh" rotation={[0, Math.PI, 0]}>
@@ -31,22 +44,38 @@ export default function Trash({name, pos}) {
       <RigidBody
         colliders={false}
         type="fixed"
-        restitution={-9}
-        friction={0}
-        name={name}
-        onCollisionEnter={(e) => {
+        name="inTrash"
+        onIntersectionEnter={(e) => {
           if (e.colliderObject.name == "item") {
             // playAudio("ball_in_cup");
             gameData.itemEnterTrash(name);
-          }
-        }}
-        onCollisionExit={(e) => {
-          if (e.colliderObject.name == "ball") {
-            gameData.itemExitTrash(name);
+            setIsCorrect(true)
           }
         }}>
-        <CuboidCollider args={[0.7, 3, 0.7]} position={[0, 0.2, 1]} />
+        <mesh
+          position={[0, 4, 0.5]}
+          rotation={[-Math.PI / 2, 0, 0]}
+          visible={true}>
+          <planeGeometry args={[2.4, 2.5]} />
+          <meshStandardMaterial
+            map={colorMap}
+            normalMap={normalMap}
+            roughnessMap={roughnessMap}
+          />
+        </mesh>
+        <CuboidCollider position={[0, 4, 0.5]} args={[1.2, 0.1, 1.25]} sensor />
       </RigidBody>
+      {/* {particle && (
+         <points ref={particleRef} position={position}>
+         <primitive object={particlesGeometry} material={particlesMaterial} />
+       </points>
+      )} */}
+      {isCorrect !== null && (
+        <CongratulationsEffect
+          isCorrect={isCorrect}
+          position={[0, 5, 0]} // Adjust the position where the explosion occurs
+        />
+      )}
     </group>
   );
 }

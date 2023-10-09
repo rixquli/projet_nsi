@@ -35,7 +35,7 @@ export const itemToThrowId = [
 const itemToThrow = [
   {
     name: "bucket_5",
-    trash: "trash_yellow",
+    trash: "trash_blue",
   },
   {
     name: "cardboard_box_2",
@@ -117,19 +117,19 @@ export const useGameStore = create(
         itemEnterTrash: (trash) => {
           console.log("enter");
 
-          get().localSet({itemInTrash: true});
-          setTimeout(() => {
-            if (get().localGet().itemInTrash) {
-              get().localSet({itemInTrash: false});
+          // get().localSet({itemInTrash: true});
+          // setTimeout(() => {
+            // if (get().localGet().itemInTrash) {
+              // get().localSet({itemInTrash: false});
               // playAudio("congratulations");
               get().localGet().nextItem(trash);
-            }
-          }, 1000);
+            // }
+          // }, 500);
         },
-        itemExitCup: () => {
-          console.log("exit");
-          get().localSet({itemInTrash: false});
-        },
+        // itemExitCup: () => {
+        //   console.log("exit");
+        //   get().localSet({itemInTrash: false});
+        // },
         nextItem: (trash) => {
           console.log("next");
           // Si bonne poubelle alors ajoute 1 point
