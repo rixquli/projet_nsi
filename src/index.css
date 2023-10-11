@@ -45,6 +45,10 @@ h6 {
   transition: all 0.5s ease-in-out;
 }
 
+.gameOver {
+  transition: none;
+}
+
 .hud {
   position: fixed;
   gap: 16px;

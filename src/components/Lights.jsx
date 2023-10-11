@@ -31,7 +31,7 @@ export default function Lights() {
         shadow-camera-left={-50}
         ref={directionalLightRef}
       />
-      <ambientLight intensity={1} />
+      <ambientLight intensity={import.meta.env.production ? 1 : 0.5} />
     </>
   );
 }
