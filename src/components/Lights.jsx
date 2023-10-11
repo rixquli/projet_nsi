@@ -1,5 +1,5 @@
 import {useHelper} from "@react-three/drei";
-import { useControls } from "leva";
+import {useControls} from "leva";
 import {useRef} from "react";
 import * as THREE from "three";
 
@@ -8,8 +8,8 @@ export default function Lights() {
    * Debug settings
    */
   const {intensity, position} = useControls("Lights Settings", {
-    intensity: 1,
-    position: [20, 30, -3]
+    intensity: import.meta.env.production ? 2 : 1,
+    position: import.meta.env.production ? [20, 30, -15] : [20, 30, -3],
   });
   const directionalLightRef = useRef();
 
