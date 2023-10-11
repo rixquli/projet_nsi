@@ -138,7 +138,6 @@ export function Items() {
     console.log(gameState);
     if (!canMove && gameState === "GAME") {
       setTimeout(() => {
-        resetPosition();
         setCanMove(true);
       }, 500);
     } else if (gameState === "RESTART_ITEM") {

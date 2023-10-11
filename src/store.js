@@ -128,21 +128,26 @@ export const useGameStore = create(
     gameData: {
       ["GAME1"]: {
         score: 0,
+        itemInTrash: false,
         itemToThrow:
-          itemToThrow[Math.round(Math.random() * (itemToThrow.length - 1))],
-        initialization:()=>{
+          itemToThrow[Math.floor(Math.random() * itemToThrow.length)],
+        initialization: () => {
           get().localSet({
             score: 0,
             itemToThrow:
-              itemToThrow[Math.round(Math.random() * (itemToThrow.length - 1))],
+              itemToThrow[Math.floor(Math.random() * itemToThrow.length)],
           });
         },
         itemEnterTrash: (trash) => {
           // if (get().localGet().itemInTrash) {
           // playAudio("congratulations");
-          get().localGet().nextItem(trash);
+          if (!get().localGet().itemInTrash) {
+            get().localSet({itemInTrash: true});
+            get().localGet().nextItem(trash);
+          }
         },
         nextItem: (trash) => {
+          console.log("nextItem");
           // Si bonne poubelle alors ajoute 1 point
           if (
             itemToThrow.find((e) => e.name == get().localGet().itemToThrow.name)
@@ -150,24 +155,19 @@ export const useGameStore = create(
           ) {
             get().localSet({
               itemToThrow:
-                itemToThrow[
-                  Math.round(Math.random() * (itemToThrow.length - 1))
-                ],
+                itemToThrow[Math.floor(Math.random() * itemToThrow.length)],
               score: get().localGet().score + 1,
             });
             // get().localGet().doParticle(trash, true);
             get().localGet().restartItem();
           } else {
             get().localGet().gameOver();
-            // get().localSet({
-            //   itemToThrow:
-            //     itemToThrow[
-            //       Math.round(Math.random() * (itemToThrow.length - 1))
-            //     ],
-            //   score: get().localGet().score - 1,
-            // });
-            // get().localGet().doParticle(trash, false);
           }
+
+          // To prevent bugs
+          setTimeout(() => {
+            get().localSet({itemInTrash: false});
+          }, 100);
         },
         doParticle: (trash, isCorrect) => {
           get().localSet({

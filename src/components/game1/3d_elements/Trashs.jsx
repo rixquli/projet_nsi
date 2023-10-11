@@ -1,10 +1,9 @@
 import {CuboidCollider, RigidBody} from "@react-three/rapier";
 import {useGLTF} from "@react-three/drei";
-import {useEffect, useRef, useState} from "react";
+import {useEffect} from "react";
 import * as THREE from "three";
 import {useGameStore} from "../../../store.js";
 import {useLoader} from "@react-three/fiber";
-import CongratulationsEffect from "../../Particles.jsx";
 
 export default function Trash({name, pos}) {
   // Load models
@@ -43,6 +42,8 @@ export default function Trash({name, pos}) {
         name="inTrash"
         onIntersectionEnter={(e) => {
           if (e.colliderObject.name == "item") {
+            console.log(name);
+            console.log(e);
             // playAudio("ball_in_cup");
             gameData.itemEnterTrash(name);
           }
