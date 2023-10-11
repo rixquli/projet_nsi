@@ -57,7 +57,8 @@ export function Items() {
       new Vector3(0, -5, 5)
     );
     body.current.setTranslation(vec3(position));
-    body.current.setLinvel(vec3({x: 0, y: 0, z: 0}));
+    body.current.setRotation(vec3({x: 0, y: 0, z: 0}));
+    body.current.setAngvel(vec3({x: 0, y: 0, z: 0}));
     body.current.setEnabled(false);
     setItemCanMove(true);
     setCanMove(true);
@@ -68,7 +69,6 @@ export function Items() {
 
     if (isMouseDown || isTouching) {
       const inputPosition = isTouching ? touchPosition : pointer;
-
       if (!inputPosition) return;
 
       setItemCanMove(false);
@@ -135,12 +135,16 @@ export function Items() {
   }, []);
 
   useEffect(() => {
+    console.log(gameState);
     if (!canMove && gameState === "GAME") {
       setTimeout(() => {
+        resetPosition();
         setCanMove(true);
       }, 500);
     } else if (gameState === "RESTART_ITEM") {
       gameData.restartItemDone();
+      resetPosition();
+    } else if (gameState === "MENU") {
       resetPosition();
     }
     if (body.current && body.current?.isEnabled() && itemCanMove) {
@@ -148,68 +152,28 @@ export function Items() {
     }
   }, [gameState]);
 
-  // const getObject = (id) => {
-  //   console.log(scene);
-  //   const children = scene.children;
-  //   console.log(children);
-
-  //   // Loop through all children and set their visibility
-  //   children.forEach((child) => {
-  //     if (child.name === id) {
-  //       // Show the child with a matching name
-  //       child.visible = true;
-  //     } else {
-  //       // Hide all other children
-  //       child.visible = false;
-  //     }
-  //   });
-  // };
-
-  // useEffect(() => {
-  //   getObject(gameData.itemToThrowId);
-  // }, [gameData.itemToThrowId]);
-
   return scene.children.map((child) => {
-    if (child.name != gameData.itemToThrowId) {
+    if (child.name != gameData.itemToThrow.name) {
       return null; // Retourne null pour les tasses qui ne sont plus dans la liste cups
     }
     return (
       <group position={new Vector3(0, 5, -5)}>
-      <RigidBody
-        mass={0.25}
-        friction={0.01}
-        ref={body}  
-        colliders="ball"
-        restitution={1.5}
-        name="item"
-        onCollisionEnter={(e) => {
-          if (e.rigidBodyObject.name === "floor") {
-            resetPosition();
-            // playAudio("pong_sound");
-          }
-        }}>
-        <primitive object={child.clone()} />
-      </RigidBody>
-    </group>
+        <RigidBody
+          mass={0.25}
+          friction={0.01}
+          ref={body}
+          colliders="ball"
+          restitution={1.5}
+          name="item"
+          onCollisionEnter={(e) => {
+            if (e.rigidBodyObject.name === "floor") {
+              resetPosition();
+              // playAudio("pong_sound");
+            }
+          }}>
+          <primitive object={child.clone()} />
+        </RigidBody>
+      </group>
     );
   });
-
-  return (
-    <group position={new Vector3(0, 5, -5)}>
-      <RigidBody
-        mass={0.25}
-        friction={0.01}
-        ref={body}  
-        restitution={1.5}
-        name="item"
-        onCollisionEnter={(e) => {
-          if (e.rigidBodyObject.name === "floor") {
-            resetPosition();
-            // playAudio("pong_sound");
-          }
-        }}>
-        <primitive object={scene} />
-      </RigidBody>
-    </group>
-  );
 }

@@ -2,8 +2,10 @@ import React from "react";
 import {gameStates, useGameStore} from "../../store.js";
 
 export const Menu = () => {
-  const {startGame, gameState, goToMenu, score,localGet, restartBall} = useGameStore();
-  
+  const {startGame, games, gameState, goToMenu, localGet} = useGameStore();
+
+  console.log(gameState);
+
   return (
     <>
       <div
@@ -22,24 +24,46 @@ export const Menu = () => {
           Multijoueur
         </button>
       </div>
-      <div
-        className={`hud text-6xl ${gameState !== gameStates.GAME ? "hud--hidden" : ""}`}>
-        <h1 className="score">{localGet()?.score || "0"}</h1>
-        {/* <button className="restartPosition">
+      {games == "GAME1" && (
+        <>
+          <div
+            className={`hud text-6xl ${
+              gameState !== gameStates.GAME ? "menu--hidden" : ""
+            }`}>
+            <div className="score">
+              <h1>{localGet()?.score || "0"}</h1>
+              <h4 className="text-lg">
+                Meilleur Score:{" "}
+                {JSON.parse(localStorage.getItem("GAME1"))?.bestScore || "0"}
+              </h4>
+            </div>
+            <h2 className="nameOfItemToThrow">
+              {localGet()?.itemToThrow.displayName}
+            </h2>
+            {/* <button className="restartPosition">
           Restart <br /> Position
         </button> */}
-      </div>
-      <div
-        className={`scores ${
-          gameState !== gameStates.GAME_OVER ? "scores--hidden" : ""
-        }`}>
-        <h1>Congratulations you are becoming a true master</h1>
-        <button
-          onClick={goToMenu}
-          disabled={gameState !== gameStates.GAME_OVER}>
-          Play again
-        </button>
-      </div>
+          </div>
+          <div
+            className={`gameOver text-6xl ${
+              gameState !== gameStates.GAME_OVER ? "menu--hidden" : ""
+            }`}>
+            <h1 className="text-red-700 font-bold" >Game Over</h1>
+            <h2>Score: {localGet()?.score || "0"}</h2>
+            <h3 className="text-center" >
+              Meilleur Score:{" "}
+              {JSON.parse(localStorage.getItem("GAME1"))?.bestScore || "0"}
+            </h3>
+            <button
+              onClick={() =>
+                goToMenu({game: "GAME1", score: localGet()?.score || "0"})
+              }
+              disabled={gameState !== gameStates.GAME_OVER}>
+              Play again
+            </button>
+          </div>
+        </>
+      )}
     </>
   );
 };

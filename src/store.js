@@ -1,3 +1,4 @@
+import {Vector3} from "three";
 import {create} from "zustand";
 import {subscribeWithSelector} from "zustand/middleware";
 
@@ -20,54 +21,57 @@ export const playAudio = (path, callback) => {
   audio.play();
 };
 
-export const itemToThrowId = [
-  "bucket_5",
-  "cardboard_box_2",
-  "glass_bottle_3",
-  "glass_shards_4",
-  "jar_8",
-  "newspaper_0",
-  "paper_bag_7",
-  "plastic_container_6",
-  "water_bottle_1",
-];
+const trashPosition = {
+  trash_blue: new Vector3(0, 3, 0),
+  trash_green: new Vector3(0, 0, 0),
+  trash_black: new Vector3(0, 3, 0),
+};
 
 const itemToThrow = [
   {
     name: "bucket_5",
-    trash: "trash_blue",
+    trash: "trash_yellow",
+    displayName: "Seau",
   },
   {
     name: "cardboard_box_2",
-    trash: "trash_green",
+    trash: "trash_yellow",
+    displayName: "Boîte en carton",
   },
   {
     name: "glass_bottle_3",
     trash: "trash_green",
+    displayName: "Bouteille en verre",
   },
   {
     name: "glass_shards_4",
     trash: "trash_black",
+    displayName: "Éclats de verre",
   },
   {
     name: "jar_8",
     trash: "trash_green",
+    displayName: "Pot en verre",
   },
   {
     name: "newspaper_0",
-    trash: "trash_green",
+    trash: "trash_yellow",
+    displayName: "Journal",
   },
   {
     name: "paper_bag_7",
-    trash: "trash_green",
+    trash: "trash_yellow",
+    displayName: "Sac en papier",
   },
   {
     name: "plastic_container_6",
-    trash: "trash_green",
+    trash: "trash_yellow",
+    displayName: "Contenant en plastique",
   },
   {
     name: "water_bottle_1",
-    trash: "trash_green",
+    trash: "trash_yellow",
+    displayName: "Bouteille d'eau",
   },
 ];
 
@@ -81,7 +85,18 @@ export const useGameStore = create(
         games: games["GAME1"],
       });
     },
-    goToMenu: () => {
+    goToMenu: ({game, score}) => {
+      if (game && score) {
+        // Récupérer les données du meilleur score depuis le stockage local
+        const bestScoreData = JSON.parse(localStorage.getItem(game));
+
+        // Si aucune donnée n'existe pour ce jeu ou si le score actuel est supérieur au meilleur score enregistré
+        if (!bestScoreData || score > bestScoreData.bestScore) {
+          // Mettre à jour le meilleur score dans le stockage local
+          localStorage.setItem(game, JSON.stringify({bestScore: score}));
+        }
+      }
+
       set({
         gameState: gameStates.MENU,
       });
@@ -91,6 +106,7 @@ export const useGameStore = create(
     },
     localSet: (props) => {
       const game = get().games;
+
       set((state) => {
         // Update the GAME1 object within gameData
         const newGameData = {
@@ -112,51 +128,68 @@ export const useGameStore = create(
     gameData: {
       ["GAME1"]: {
         score: 0,
-        itemToThrowId:
-        itemToThrow[Math.round(Math.random() * (itemToThrow.length - 1))].name,
-        itemEnterTrash: (trash) => {
-          console.log("enter");
-
-          // get().localSet({itemInTrash: true});
-          // setTimeout(() => {
-            // if (get().localGet().itemInTrash) {
-              // get().localSet({itemInTrash: false});
-              // playAudio("congratulations");
-              get().localGet().nextItem(trash);
-            // }
-          // }, 500);
+        itemToThrow:
+          itemToThrow[Math.round(Math.random() * (itemToThrow.length - 1))],
+        initialization:()=>{
+          get().localSet({
+            score: 0,
+            itemToThrow:
+              itemToThrow[Math.round(Math.random() * (itemToThrow.length - 1))],
+          });
         },
-        // itemExitCup: () => {
-        //   console.log("exit");
-        //   get().localSet({itemInTrash: false});
-        // },
+        itemEnterTrash: (trash) => {
+          // if (get().localGet().itemInTrash) {
+          // playAudio("congratulations");
+          get().localGet().nextItem(trash);
+        },
         nextItem: (trash) => {
-          console.log("next");
           // Si bonne poubelle alors ajoute 1 point
-          if (itemToThrow.find((e) => e.name == get().localGet().itemToThrowId).trash == trash) {
+          if (
+            itemToThrow.find((e) => e.name == get().localGet().itemToThrow.name)
+              .trash == trash
+          ) {
             get().localSet({
-              itemToThrowId:
-              itemToThrow[
+              itemToThrow:
+                itemToThrow[
                   Math.round(Math.random() * (itemToThrow.length - 1))
-                ].name,
+                ],
               score: get().localGet().score + 1,
-            }); // Update the state with the modified array
+            });
+            // get().localGet().doParticle(trash, true);
+            get().localGet().restartItem();
           } else {
-            get().localSet({
-              itemToThrowId:
-              itemToThrow[
-                  Math.round(Math.random() * (itemToThrow.length - 1))
-                ].name,
-              score: get().localGet().score - 1,
-            }); // Update the state with the modified array
+            get().localGet().gameOver();
+            // get().localSet({
+            //   itemToThrow:
+            //     itemToThrow[
+            //       Math.round(Math.random() * (itemToThrow.length - 1))
+            //     ],
+            //   score: get().localGet().score - 1,
+            // });
+            // get().localGet().doParticle(trash, false);
           }
-          get().localGet().restartItem();
+        },
+        doParticle: (trash, isCorrect) => {
+          get().localSet({
+            particle: {position: trashPosition[trash], isCorrect: isCorrect},
+          });
+        },
+        restartParticles: () => {
+          get().localSet({
+            particle: {position: [0, 0, 0], isCorrect: null},
+          });
         },
         restartItem: () => {
           set({gameState: gameStates.RESTART_ITEM});
         },
         restartItemDone: () => {
           set({gameState: gameStates.GAME});
+        },
+        gameOver: () => {
+          console.log("Game Over!");
+          set({
+            gameState: gameStates.GAME_OVER,
+          });
         },
       },
     },

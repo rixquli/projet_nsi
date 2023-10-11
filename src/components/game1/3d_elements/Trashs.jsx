@@ -13,9 +13,6 @@ export default function Trash({name, pos}) {
   }));
   const object = useGLTF(`/models/${name}.glb`);
 
-  const [particle, setParticle] = useState(true);
-  const [isCorrect, setIsCorrect] = useState(null);
-
   useEffect(() => {
     // Receive Shadows
     object.scene.traverse((child) => {
@@ -35,7 +32,6 @@ export default function Trash({name, pos}) {
     "/textures/15_-_Default_normal.png",
   ]);
 
-
   return (
     <group position={pos}>
       <RigidBody type="fixed" colliders="trimesh" rotation={[0, Math.PI, 0]}>
@@ -49,7 +45,6 @@ export default function Trash({name, pos}) {
           if (e.colliderObject.name == "item") {
             // playAudio("ball_in_cup");
             gameData.itemEnterTrash(name);
-            setIsCorrect(true)
           }
         }}>
         <mesh
@@ -65,17 +60,6 @@ export default function Trash({name, pos}) {
         </mesh>
         <CuboidCollider position={[0, 4, 0.5]} args={[1.2, 0.1, 1.25]} sensor />
       </RigidBody>
-      {/* {particle && (
-         <points ref={particleRef} position={position}>
-         <primitive object={particlesGeometry} material={particlesMaterial} />
-       </points>
-      )} */}
-      {isCorrect !== null && (
-        <CongratulationsEffect
-          isCorrect={isCorrect}
-          position={[0, 5, 0]} // Adjust the position where the explosion occurs
-        />
-      )}
     </group>
   );
 }

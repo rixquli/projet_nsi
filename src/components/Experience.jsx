@@ -4,10 +4,8 @@ import {Perf} from "r3f-perf";
 import {Grid, KeyboardControls} from "@react-three/drei";
 import {Physics} from "@react-three/rapier";
 import Floor from "./3d_elements/Floor";
-import ExampleObject from "./3d_elements/Example";
 import Lights from "./Lights.jsx";
 import Game1 from "./game1/Index.jsx";
-import { Suspense } from "react";
 
 const Experience = () => {
   /**
@@ -50,24 +48,22 @@ const Experience = () => {
       />
       {/* Initialise la grille au sol */}
 
-      <Suspense>
-        <Physics debug={physics} timeStep="vary" gravity={[0, -20, 0]}>
-          {/* Keyboard preset */}
-          <KeyboardControls map={keyboardMap}>
-            {/* Character Control */}
-            <Game1 />
-          </KeyboardControls>
+      <Physics debug={physics} timeStep="vary" gravity={[0, -20, 0]}>
+        {/* Keyboard preset */}
+        <KeyboardControls map={keyboardMap}>
+          {/* Character Control */}
+          <Game1 />
+        </KeyboardControls>
 
-          {/* 3D Ojects */}
-          {/* <ExampleObject /> */}
+        {/* 3D Ojects */}
+        {/* <ExampleObject /> */}
 
-          {/* Floor */}
-          <Floor />
+        {/* Floor */}
+        <Floor />
 
-          {/* Shoting cubes */}
-          {/* <ShotCube /> */}
-        </Physics>
-      </Suspense>
+        {/* Shoting cubes */}
+        {/* <ShotCube /> */}
+      </Physics>
     </>
   );
 };
