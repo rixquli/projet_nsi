@@ -4,10 +4,10 @@ import Trash from "./3d_elements/Trashs";
 import {gameStates, useGameStore} from "../../store.js";
 
 const Game1 = () => {
-  // const {initialization, gameState} = useGameStore((state) => ({
-  //   initialization: state.gameData["GAME1"].initialization,
-  //   gameState: state.gameState,
-  // }));
+  const {initialization, gameState} = useGameStore((state) => ({
+    initialization: state.gameData["GAME1"].initialization,
+    gameState: state.gameState,
+  }));
 
   const crashTest = (n) => {
     let result = [];
@@ -17,9 +17,9 @@ const Game1 = () => {
     return result;
   };
 
-  // useEffect(() => {
-  //   if (gameState === gameStates.MENU) initialization();
-  // }, [gameState]);
+  useEffect(() => {
+    if (gameState === gameStates.MENU) initialization();
+  }, [gameState]);
 
   return (
     <>
@@ -30,8 +30,6 @@ const Game1 = () => {
       {/* {crashTest(500)} */}
 
       <Items />
-
-      {/* <CongratulationsEffect /> */}
     </>
   );
 };
