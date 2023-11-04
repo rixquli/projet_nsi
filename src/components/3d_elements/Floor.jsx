@@ -5,7 +5,7 @@ export default function Floor() {
     <RigidBody name="floor" type="fixed">
       <mesh receiveShadow position={[0, -3.5, 0]}>
         <boxGeometry args={[300, 5, 300]} />
-        <meshStandardMaterial color="lightblue" />
+        <meshStandardMaterial visible={false} />
       </mesh>
     </RigidBody>
   );

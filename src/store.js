@@ -3,15 +3,22 @@ import {create} from "zustand";
 import {subscribeWithSelector} from "zustand/middleware";
 
 export const gameStates = {
+  HOME_PAGE: "HOME_PAGE",
+  GAMES_LIST: "GAMES_LIST",
   MENU: "MENU",
   GAME: "GAME",
-  RESTART_ITEM: "RESTART_ITEM",
-  GAME_OVER: "GAME_OVER",
 };
 
 export const games = {
   ["GAME1"]: "GAME1",
 };
+
+export const gamesAssets = [
+  {
+    name: "GAME1",
+    img: "/images/game1.jfif",
+  },
+];
 
 export const playAudio = (path, callback) => {
   const audio = new Audio(`./sounds/${path}.mp3`);
@@ -77,28 +84,23 @@ const itemToThrow = [
 
 export const useGameStore = create(
   subscribeWithSelector((set, get) => ({
-    gameState: gameStates.MENU,
+    gameState: gameStates.HOME_PAGE,
     cameraPosition: [0, 10, -10],
-    startGame: () => {
+    startGame: (game) => {
       set({
         gameState: gameStates.GAME,
-        games: games["GAME1"],
+        games: games[game],
+      });
+      get().localSet({gameStateInGame: "INITIALIZATION"});
+    },
+    goToGamesList: () => {
+      set({
+        gameState: gameStates.GAMES_LIST,
       });
     },
-    goToMenu: ({game, score}) => {
-      if (game && score) {
-        // Récupérer les données du meilleur score depuis le stockage local
-        const bestScoreData = JSON.parse(localStorage.getItem(game));
-
-        // Si aucune donnée n'existe pour ce jeu ou si le score actuel est supérieur au meilleur score enregistré
-        if (!bestScoreData || score > bestScoreData.bestScore) {
-          // Mettre à jour le meilleur score dans le stockage local
-          localStorage.setItem(game, JSON.stringify({bestScore: score}));
-        }
-      }
-
+    goToMenu: () => {
       set({
-        gameState: gameStates.MENU,
+        gameState: gameStates.HOME_PAGE,
       });
     },
     setIsMouseDown: (bool) => {
@@ -128,14 +130,26 @@ export const useGameStore = create(
     gameData: {
       ["GAME1"]: {
         score: 0,
+        gameStateInGame: "GAME",
         itemInTrash: false,
         itemToThrow:
           itemToThrow[Math.floor(Math.random() * itemToThrow.length)],
         initialization: () => {
+          if (get().localGet().score > 0) {
+            // Récupérer les données du meilleur score depuis le stockage local
+            const bestScoreData = JSON.parse(localStorage.getItem("GAME1"));
+
+            // Si aucune donnée n'existe pour ce jeu ou si le score actuel est supérieur au meilleur score enregistré
+            if (!bestScoreData || score > bestScoreData.bestScore) {
+              // Mettre à jour le meilleur score dans le stockage local
+              localStorage.setItem("GAME1", JSON.stringify({bestScore: score}));
+            }
+          }
           get().localSet({
             score: 0,
             itemToThrow:
               itemToThrow[Math.floor(Math.random() * itemToThrow.length)],
+            gameStateInGame: "GAME",
           });
         },
         itemEnterTrash: (trash) => {
@@ -180,16 +194,18 @@ export const useGameStore = create(
           });
         },
         restartItem: () => {
-          set({gameState: gameStates.RESTART_ITEM});
+          get().localSet({gameStateInGame: "RESTART_ITEM"});
         },
         restartItemDone: () => {
-          set({gameState: gameStates.GAME});
+          get().localSet({gameStateInGame: "GAME"});
         },
         gameOver: () => {
           console.log("Game Over!");
-          set({
-            gameState: gameStates.GAME_OVER,
-          });
+          get().localSet({gameStateInGame: "GAME_OVER"});
+        },
+        playAgain: () => {
+          console.log("Play Again!");
+          get().localSet({gameStateInGame: "INITIALIZATION"});
         },
       },
     },

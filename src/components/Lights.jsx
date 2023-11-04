@@ -9,7 +9,7 @@ export default function Lights() {
    */
   const {intensity, position} = useControls("Lights Settings", {
     intensity: import.meta.env.production ? 2 : 1,
-    position: import.meta.env.production ? [20, 30, -15] : [20, 30, -3],
+    position: import.meta.env.production ? [20, 30, -15] : [-3,6,-4],
   });
   const directionalLightRef = useRef();
 

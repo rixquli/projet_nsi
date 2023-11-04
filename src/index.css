@@ -29,6 +29,7 @@ h6 {
 
 .menu,
 .scores,
+.gamesList,
 .gameOver {
   position: fixed;
   display: flex;
@@ -43,6 +44,10 @@ h6 {
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(4px);
   transition: all 0.5s ease-in-out;
+}
+
+.gameCard {
+  border: 1px solid black;
 }
 
 .gameOver {

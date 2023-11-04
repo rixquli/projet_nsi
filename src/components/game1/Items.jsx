@@ -1,15 +1,16 @@
 import {useFrame, useThree} from "@react-three/fiber";
-import {BallCollider, RigidBody, vec3} from "@react-three/rapier";
+import {RigidBody, vec3} from "@react-three/rapier";
 import {useEffect, useRef, useState} from "react";
 import {Plane, Raycaster, Vector3} from "three";
-import {playAudio, useGameStore} from "../../store.js";
+import {useGameStore} from "../../store.js";
 import {useGLTF, useKeyboardControls} from "@react-three/drei";
 // import {Controls} from "../../App.jsx";
 
 export function Items() {
   const {camera} = useThree();
-  const {gameState, gameData} = useGameStore((state) => ({
+  const {gameState, gameData, gameStateInGame} = useGameStore((state) => ({
     gameState: state.gameState,
+    gameStateInGame: state.gameData["GAME1"].gameStateInGame,
     games: state.games,
     gameData: state.gameData["GAME1"],
   }));
@@ -135,28 +136,26 @@ export function Items() {
   }, []);
 
   useEffect(() => {
-    console.log(gameState);
-    if (!canMove && gameState === "GAME") {
+    console.log(gameStateInGame);
+    if (!canMove && gameStateInGame === "GAME") {
       setTimeout(() => {
         setCanMove(true);
       }, 500);
-    } else if (gameState === "RESTART_ITEM") {
+    } else if (gameStateInGame === "RESTART_ITEM") {
       gameData.restartItemDone();
-      resetPosition();
-    } else if (gameState === "MENU") {
       resetPosition();
     }
     if (body.current && body.current?.isEnabled() && itemCanMove) {
       body.current.setEnabled(false);
     }
-  }, [gameState]);
+  }, [gameStateInGame]);
 
   return scene.children.map((child) => {
     if (child.name != gameData.itemToThrow.name) {
       return null; // Retourne null pour les tasses qui ne sont plus dans la liste cups
     }
     return (
-      <group position={new Vector3(0, 5, -5)}>
+      <group position={new Vector3(0, 5, -5)} key={child.id}>
         <RigidBody
           mass={0.25}
           friction={0.01}

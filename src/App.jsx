@@ -42,13 +42,8 @@ function App() {
           far: 1000,
           position: cameraPosition,
         }}
-        // onPointerDown={(e) => {
-        //   e.target.requestPointerLock();
-        // }}
       >
-        <Suspense fallback={null} >
-          <Experience />
-        </Suspense>
+        <Experience />
       </Canvas>
       <Menu />
     </>
