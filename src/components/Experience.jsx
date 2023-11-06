@@ -42,7 +42,7 @@ const Experience = () => {
     );
     return (
       <>
-        <Background scale={0.0015} />
+        {/*<Background scale={0.0015} />*/}
         <Lights />
         <Skybox paths={paths} />
       </>
