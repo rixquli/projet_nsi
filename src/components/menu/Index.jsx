@@ -4,7 +4,7 @@ import Home from "./Home.jsx";
 import GamesList from "./GamesList.jsx";
 
 export const Menu = () => {
-  const {startGame, games, gameState, goToMenu, localGet} = useGameStore();
+  const {gameState} = useGameStore();
 
   const components = {
        [gameStates.HOME_PAGE]:<Home />,

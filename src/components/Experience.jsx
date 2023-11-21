@@ -1,22 +1,15 @@
-import {useControls} from "leva";
-import React, {Suspense, useEffect} from "react";
+import React, {Suspense} from "react";
 import {Perf} from "r3f-perf";
 import {KeyboardControls} from "@react-three/drei";
-import {Physics} from "@react-three/rapier";
-import Floor from "./3d_elements/Floor";
 import Lights from "./Lights.jsx";
 import Game1 from "./game1/Index.jsx";
 import {useGameStore} from "../store.js";
 import LoadingScreen from "./LoadingScreen.jsx";
 import {Background} from "./menu/Background.jsx";
 import Skybox from "./helpers/Skybox.jsx";
+import { Background2 } from "./game1/3d_elements/earth.jsx";
 
 const Experience = () => {
-  // Debug settings
-  const {physics} = useControls("World Settings", {
-    physics: false,
-  });
-
   // Keyboard control preset
   const keyboardMap = [
     {name: "forward", keys: ["ArrowUp", "KeyW"]},
@@ -42,7 +35,7 @@ const Experience = () => {
     );
     return (
       <>
-        <Background scale={0.0015} />
+        <Background2 scale={0.0015} />
         <Lights />
         <Skybox paths={paths} />
       </>
@@ -51,11 +44,8 @@ const Experience = () => {
 
   return (
     <>
-      <Perf position="top-left" />
       {/* Affiche les performances */}
-
-      {/* <Lights /> */}
-      {/* Initialise les lumières */}
+      <Perf position="top-left" />
 
       {/* <Grid
         args={[300, 300]}
@@ -66,29 +56,17 @@ const Experience = () => {
       /> */}
       {/* Initialise la grille au sol */}
 
-      {/* <Model scale={5} /> */}
-        {(gameState === "HOME_PAGE" || gameState === "GAMES_LIST") &&
-          homeBackground()}
+      {(gameState === "HOME_PAGE" || gameState === "GAMES_LIST") &&
+        homeBackground()}
 
-      <Physics debug={physics} timeStep="vary" gravity={[0, -20, 0]}>
-        {/* Keyboard preset */}
-        <KeyboardControls map={keyboardMap}>
-          {/* changement de jeu */}
-          <Suspense fallback={<LoadingScreen />}>
-            {gameState === "GAME" &&
-              gamesComponents.find((e) => e.name === games).component}
-          </Suspense>
-        </KeyboardControls>
-
-        {/* 3D Ojects */}
-        {/* <ExampleObject /> */}
-
-        {/* Floor */}
-        <Floor />
-
-        {/* Shoting cubes */}
-        {/* <ShotCube /> */}
-      </Physics>
+      {/* Keyboard preset */}
+      <KeyboardControls map={keyboardMap}>
+        {/* changement de jeu */}
+        <Suspense fallback={<LoadingScreen />}>
+          {gameState === "GAME" &&
+            gamesComponents.find((e) => e.name === games).component}
+        </Suspense>
+      </KeyboardControls>
     </>
   );
 };

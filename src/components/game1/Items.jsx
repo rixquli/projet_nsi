@@ -157,7 +157,7 @@ export function Items() {
     return (
       <group position={new Vector3(0, 5, -5)} key={child.id}>
         <RigidBody
-          mass={0.25}
+        gravityScale={2.5}
           friction={0.01}
           ref={body}
           colliders="ball"
